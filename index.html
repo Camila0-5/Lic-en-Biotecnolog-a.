@@ -120,6 +120,79 @@
 
   <!-- SCRIPT -->
   <script>
+  const correlativas = {
+    "Tópicos de álgebra": ["Cálculo II"],
+    "Introducción a la física": ["Física aplicada a las biociencias"],
+    "Química general": ["Química general e inorgánica"],
+    "Introducción a la biología molecular y celular": ["Biología y fisiología molecular", "Microbiología general"],
+    "Cálculo I": ["Cálculo II", "Probabilidad y estadística"],
+    "Física aplicada a las biociencias": ["Fisicoquímica", "Fenómenos de transporte"],
+    "Cálculo II": ["Fenómenos de transporte"],
+    "Química general e inorgánica": ["Química analítica", "Química orgánica"],
+    "Dirección de empresas": ["Estrategias industriales"],
+    "Biología y fisiología molecular": ["Genética molecular", "Inmunología", "Bioética", "Agrobiotecnología"],
+    "Química analítica": ["Análisis instrumental"],
+    "Química orgánica": ["Química biológica I"],
+    "Probabilidad y estadística": ["Bioestadística"],
+    "Genética molecular": ["Técnicas biotecnológicas", "Bioinformática"],
+    "Química biológica I": ["Química biológica II", "Cultivos celulares"],
+    "Técnicas biotecnológicas": ["Ingeniería genética I", "Proyecto final de licenciatura", "Genómica y proteómica", "Nanobiotecnología", "Laboratorio de diagnóstico y ciencias forenses"],
+    "Fenómenos de transporte": ["Biorreactores"],
+    "Química biológica II": ["Biología de sistemas"],
+    "Ingeniería genética I": ["Ingeniería genética II"],
+    "Comercialización de productos biotecnológicos": ["Desarrollo de negocios biotecnológicos"],
+    "Bioinformática": ["Genómica y proteómica"],
+    "Biorreactores": ["Industrias y procesos biotecnológicos", "Laboratorio de bioprocesos"]
+  };
+
+  const completadas = new Set();
+
+  document.querySelectorAll('.materia').forEach(materia => {
+    const nombre = materia.innerText;
+    if (!esBloqueada(nombre)) {
+      materia.onclick = () => completar(nombre);
+    } else {
+      materia.classList.add('bloqueada');
+    }
+  });
+
+  function esBloqueada(nombre) {
+    return Object.entries(correlativas).some(([req, deps]) =>
+      deps.includes(nombre) && !completadas.has(req)
+    );
+  }
+
+  function completar(nombre) {
+    const el = Array.from(document.querySelectorAll('.materia')).find(d => d.innerText === nombre);
+    if (!el) return;
+    el.classList.add('completada');
+    el.onclick = null;
+    completadas.add(nombre);
+    desbloquearMaterias();
+    mostrar(nombre);
+  }
+
+  function desbloquearMaterias() {
+    document.querySelectorAll('.materia').forEach(materia => {
+      const nombre = materia.innerText;
+      if (materia.classList.contains('completada')) return;
+
+      if (!esBloqueada(nombre)) {
+        materia.classList.remove('bloqueada');
+        materia.onclick = () => completar(nombre);
+      }
+    });
+  }
+
+  function mostrar(nombre) {
+    const div = document.getElementById("info");
+    const abre = correlativas[nombre]
+      ? "Abre: " + correlativas[nombre].join(", ")
+      : "Sin correlativas registradas.";
+    div.innerHTML = `<strong>${nombre}</strong><br>${abre}`;
+    div.style.display = "block";
+  }
+  <script>
     const correlativas = {
       "Tópicos de álgebra": ["Cálculo II"],
       "Introducción a la física": ["Física aplicada a las biociencias"],
